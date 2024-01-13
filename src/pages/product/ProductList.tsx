@@ -12,7 +12,6 @@ import { MdDelete, MdEdit } from 'react-icons/md'
 import { IoMdEye } from 'react-icons/io'
 import Table from '../../components/Table'
 import Toggle from '../../components/Toggle'
-import { HiOutlineDocumentAdd } from 'react-icons/hi'
 import Button from '../../components/Button'
 
 const ProductList = () => {

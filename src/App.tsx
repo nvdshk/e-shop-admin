@@ -10,6 +10,7 @@ import SubCategory from './pages/sub_category/SubCategory';
 import AddProduct from './pages/product/AddProduct';
 import UpdateSubCategory from './pages/sub_category/UpdateSubCategory';
 import ProductList from './pages/product/ProductList';
+import UpdateProduct from './pages/product/UpdateProduct';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
               <Route path='sub-category/edit/:id' element={<UpdateSubCategory/>}/>
               <Route path='products/add' element={<AddProduct/>}/>
               <Route path='products/list' element={<ProductList/>}/>
+              <Route path='products/edit/:id' element={<UpdateProduct/>}/>
             </Route>
           </Routes>
       </BrowserRouter>
