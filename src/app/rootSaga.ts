@@ -7,7 +7,7 @@ import productSaga from '../features/product/productSaga'
 
 export default function* rootSaga() {
   yield all([
-    authSaga(),
+    // authSaga(),
     categorySaga(),
     subCategorySaga(),
     productSaga(),

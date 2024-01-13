@@ -1,31 +1,33 @@
 import React, { useEffect, useState } from 'react'
 import loginImg from '../../assets/ecommerce.jpg'
 import { LoginPayload } from '../../interface/userInteface'
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { authSliceAction } from '../../features/auth/authAction';
 import Button from '../../components/Button';
 import { useNavigate } from 'react-router-dom';
-import { RootState } from '../../app/store';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLoginMutation } from '../../features/auth/authApis';
 
 
 const Login = () => {
 
+    const [login, { error, isSuccess,isLoading, data }] = useLoginMutation()
+
     const navigate = useNavigate()
 
-    const authState = useAppSelector((state: RootState) => state.auth);
-    const loginState = authState.login
-    const dispatch = useAppDispatch();
-
     useEffect(() => {
-        if (!loginState.loading && authState.token) {
-            toast.success('Successfully Login');
-            navigate('/')
-        } else if (!loginState.loading && authState.error) {
-            toast.error(authState.error.message);
+        
+        if (data != null) {
+        //   const message = 'Login successfull'
+        //   toast.success(message)
+          navigate('/')
         }
-    }, [authState.token, loginState.loading])
+        if (error) {
+          if ('data' in error) {
+            const errorData = error as any
+            toast.error(errorData.data.message)
+          }
+        }
+      }, [isSuccess, error, data])
 
     const [form, setForm] = useState<LoginPayload>({
         email: '',
@@ -40,10 +42,10 @@ const Login = () => {
         })
     }
 
-    const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.ChangeEvent<HTMLFormElement>) => {
         event.preventDefault()
         const data = form
-        dispatch(authSliceAction.loginAction(data))
+        await login(data)
     }
     return (
         <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
@@ -85,7 +87,7 @@ const Login = () => {
                         />
                     </div>
                     <div className='flex w-full my-5'>
-                        <Button type='submit' loading={loginState.loading} children='Login'/>
+                        <Button type='submit' loading={isLoading} children='Login'/>
                     </div>
                     <div className='flex justify-between'>
                         <p className='flex items-center'><input className='mr-2' type="checkbox" /> Remember Me</p>

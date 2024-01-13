@@ -38,3 +38,8 @@ export function getOrderStatus(status: string) {
 			)
 	}
 }
+
+export function toCurrency(value: string) {
+    let number = parseFloat(value);
+    return number.toLocaleString('USD');
+}

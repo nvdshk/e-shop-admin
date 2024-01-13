@@ -1,37 +1,57 @@
-import React, { useEffect } from 'react'
-import { Category } from '../../interface/categoryInterface'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Spinner from '../../components/Spinner'
 import {
-  useDeleteCategoryMutation,
-  useGetAllCategoryQuery,
-} from '../../features/category/categoryApis'
+  useDeleteSubCategoryMutation,
+  useGetAllSubCategoryQuery,
+} from '../../features/sub_category/subCategoryApis'
+import { SubCategory } from '../../interface/categoryInterface'
+import { toast } from 'react-toastify'
 
-const CategoryList = ({refresh, setRefresh}: {refresh: boolean, setRefresh: any} ) => {
+const SubCategoryList = ({
+  refresh,
+  setRefresh,
+}: {
+  refresh: boolean
+  setRefresh: any
+}) => {
   const {
     data: categories,
     isLoading,
     error: getCategoriesFailed,
     refetch,
-  } = useGetAllCategoryQuery(undefined, { refetchOnMountOrArgChange: true })
+  } = useGetAllSubCategoryQuery(undefined, { refetchOnMountOrArgChange: true })
 
   const [
     deleteCategory,
     { isSuccess: deleteCategorySuccess, error: deleteCategoryFailed },
-  ] = useDeleteCategoryMutation()
+  ] = useDeleteSubCategoryMutation()
 
-  useEffect(()=>{
-    if(refresh){
+  useEffect(() => {
+    if (refresh) {
       refetch()
     }
-  },[refresh])
-  
+  }, [refresh])
+
   useEffect(() => {
     if (categories?.data) {
-      
-      if(refresh){
+      if (refresh) {
         setRefresh(false)
       }
+
+      let subCategories: any = []
+      for (let i = 0; i < categories.data.length; i++) {
+        let childCategory = categories.data[i].children
+
+        if (childCategory.length > 0) {
+          for (let j = 0; j < childCategory.length; j++) {
+            
+            subCategories.push(childCategory[j])
+          }
+        }
+      }
+      subCategories.reverse();
+      setSubCategory(subCategories)
     }
     if (getCategoriesFailed) {
       if ('data' in getCategoriesFailed) {
@@ -43,26 +63,29 @@ const CategoryList = ({refresh, setRefresh}: {refresh: boolean, setRefresh: any}
 
   useEffect(() => {
     if (deleteCategorySuccess) {
-      const message = 'Category deleted successfully'
-      // toast.success(message)
+      const message = 'Sub-Category deleted successfully'
+      toast.success(message)
       refetch()
     }
     if (deleteCategoryFailed) {
       if ('data' in deleteCategoryFailed) {
         const errorData = deleteCategoryFailed as any
-        // toast.error(errorData.data.message)
+        toast.error(errorData.data.message)
       }
     }
   }, [deleteCategorySuccess, deleteCategoryFailed])
 
   const navigate = useNavigate()
 
+  const [subCategory, setSubCategory] = useState<Array<SubCategory>>()
+ 
+
   const handleDelete = async (id: string) => {
     await deleteCategory(id)
   }
 
   const handleUpdate = (id: string): void => {
-    navigate(`/category/edit/${id}`)
+    navigate(`/sub-category/edit/${id}`)
   }
 
   if (isLoading) {
@@ -161,6 +184,12 @@ const CategoryList = ({refresh, setRefresh}: {refresh: boolean, setRefresh: any}
                     scope="col"
                     className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
                   >
+                    ParentID
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
+                  >
                     Status
                   </th>
                   <th
@@ -178,9 +207,9 @@ const CategoryList = ({refresh, setRefresh}: {refresh: boolean, setRefresh: any}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {categories?.data &&
-                  [...categories.data].reverse().map((category: Category, index: number) => (
-                    <tr key={category._id}>
+                {subCategory &&
+                  subCategory?.map((subCategory: SubCategory, index: number) => (
+                    <tr key={subCategory._id}>
                       {/* <td className="py-3 pl-4">
                                         <div className="flex items-center h-5">
                                             <input
@@ -199,7 +228,10 @@ const CategoryList = ({refresh, setRefresh}: {refresh: boolean, setRefresh: any}
                         {index + 1}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                        {category.name}
+                        {subCategory.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                        {subCategory?.parentId}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
                         Active
@@ -208,7 +240,7 @@ const CategoryList = ({refresh, setRefresh}: {refresh: boolean, setRefresh: any}
                         <a
                           className="text-green-500 hover:text-green-700"
                           href="#"
-                          onClick={() => handleUpdate(category._id!)}
+                          onClick={() => handleUpdate(subCategory._id!)}
                         >
                           Edit
                         </a>
@@ -217,7 +249,7 @@ const CategoryList = ({refresh, setRefresh}: {refresh: boolean, setRefresh: any}
                         <a
                           className="text-red-500 hover:text-red-700"
                           href="#"
-                          onClick={() => handleDelete(category._id!)}
+                          onClick={() => handleDelete(subCategory._id!)}
                         >
                           Delete
                         </a>
@@ -233,4 +265,4 @@ const CategoryList = ({refresh, setRefresh}: {refresh: boolean, setRefresh: any}
   )
 }
 
-export default CategoryList
+export default SubCategoryList

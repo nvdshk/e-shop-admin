@@ -2,114 +2,113 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import TextField from '../../components/TextField'
 import Button from '../../components/Button'
 import FileInput from '../../components/FileInput'
-import { CategoryPayload } from '../../interface/categoryInterface'
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { RootState } from '../../app/store'
-import { categorySliceAction } from '../../features/category/categoryAction'
 import { toast } from 'react-toastify'
-import { fileUploadSliceAction } from '../../features/upload/fileUploadAction'
 import { useNavigate, useParams } from 'react-router-dom'
+import {
+  useGetCategoryQuery,
+  useUpdateCategoryMutation,
+} from '../../features/category/categoryApis'
+import Spinner from '../../components/Spinner'
+import { useFileUploadMutation } from '../../features/upload/fileUploadApis'
 
 const UpdateCategory = () => {
-
-
   const { id } = useParams()
-  const categoryState = useAppSelector((state: RootState) => state.category);
-  const existingCategory = categoryState.category.filter(i => i._id === id)
-  const { name, image } = existingCategory[0]
 
-  const [categoryName, setCategoryName] = useState<string>(name);
-  const [currentImage, setCurrentImage] = useState<string | File>(image);
+  const { isLoading: categoryIsLoading, data: categoryData } =
+    useGetCategoryQuery(id as string, {refetchOnMountOrArgChange: true})
 
-  const fileUploadState = useAppSelector((state: RootState) => state.file);
-  const dispatch = useAppDispatch();
 
+  const [fileUpload, { isLoading: fileUploadLoading }] = useFileUploadMutation()
+  const [
+    updateCategory,
+    {
+      isLoading: updateCategoryLoading,
+      isSuccess: updateCategorySuccess,
+      error: updateCategoryFailed,
+    },
+  ] = useUpdateCategoryMutation()
+
+ 
+
+  
+  const [categoryName, setCategoryName] = useState<string>('')
+  const [currentImage, setCurrentImage] = useState<string | File>()
 
   const navigate = useNavigate()
 
-
+  useEffect(() => {
+    if (categoryData?.data) {
+      const category = categoryData.data
+      setCategoryName(category?.name)
+      setCurrentImage(category?.image)
+    }
+  }, [categoryData])
 
   useEffect(() => {
-
-    if (!fileUploadState.loading
-      && fileUploadState.data?.success
-      && fileUploadState.data.url
-    ) {
-
-      const name = categoryName
-      const image = fileUploadState.data.url
-
-
-      dispatch(categorySliceAction.updateCategoryStartAction({ id: id, name: name, image: image }))
-      
-
+    if (updateCategorySuccess) {
+      const message = 'Category updated successfully'
+      toast.success(message)
+      navigate(-2)
     }
-    else if (!fileUploadState.loading && fileUploadState.error) {
-      toast.error(fileUploadState.error.message);
+    if (updateCategoryFailed) {
+      if ('data' in updateCategoryFailed) {
+        const errorData = updateCategoryFailed as any
+        toast.error(errorData.data.message)
+      }
     }
-
-  }, [
-    fileUploadState.loading,
-    fileUploadState.data?.success,
-    fileUploadState.data?.url,
-  ])
-
-  useEffect(() => {
-
-
-    if (!categoryState.update.loading && categoryState.update.successMessage) {
-      toast.success(categoryState.update.successMessage);
-      dispatch(categorySliceAction.resetAction())
-      // navigate(-1)
-    }
-    else if (!categoryState.update.loading && categoryState.update.error) {
-      toast.error(categoryState.update.error.message);
-      dispatch(categorySliceAction.resetAction())
-    }
-  }, [
-    categoryState.update.loading,
-  ])
-
-
-
+  }, [updateCategorySuccess, updateCategoryFailed])
 
   const handleImage = (event: ChangeEvent<HTMLInputElement>): void => {
-    const selectedFiles = event.target.files as FileList;
+    const selectedFiles = event.target.files as FileList
     setCurrentImage(selectedFiles?.[0])
   }
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const name = event.target.value
     setCategoryName(name)
-
   }
 
-
-  const handleOnClick = (): void => {
-
+  const handleOnClick = async () => {
     if (!categoryName) {
       toast.error('Category field cannot be empty!')
       return
-    }
-    else if (!currentImage) {
+    } else if (!currentImage) {
       toast.error('Choose image cannot be empty!')
       return
     }
 
-    if (typeof currentImage === 'string') {
-      dispatch(categorySliceAction.updateCategoryStartAction({id: id, name: categoryName, image: currentImage }))
+    const _id = id as string
+    const name = categoryName
+    let image = typeof currentImage === 'string'? currentImage as string : ''
 
-    } else {
-      dispatch(fileUploadSliceAction.uploadStartAction(currentImage as File))
-
+    if (typeof currentImage !== 'string' && image === '') {
+      try {
+        const response = await fileUpload(currentImage).unwrap()
+        if (!response.url) return
+        image = response.url
+      } catch (error: any) {
+        console.log(`error ${error}`)
+        toast.error(error)
+      }
     }
 
+
+    const data = { _id: _id, data: { name: name, image: image } }
+    await updateCategory(data)
+  }
+
+  if (!categoryData?.data) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    )
   }
 
   return (
-    <div className='w-full bg-white p-5 rounded'>
-      <div className='py-6'>
-        <h2 className='text-1xl font-bold'>Update Category</h2>
+    <div className="w-full bg-white p-5 rounded">
+      <div className="py-6">
+        <h2 className="text-1xl font-bold">Update Category</h2>
         <div className="bg-gray-100 h-[2px] mt-4" />
       </div>
       <TextField
@@ -122,22 +121,28 @@ const UpdateCategory = () => {
         placeholder="Ex: Category Name"
       />
       {currentImage && (
-        <div className=' mt-4'>
-          <img className='rounded-lg w-20 h-20'
-            src={typeof currentImage === 'string' ? currentImage : URL.createObjectURL(currentImage as File)}
-            alt="" />
+        <div className=" mt-4">
+          <img
+            className="rounded-lg w-20 h-20"
+            src={
+              typeof currentImage === 'string'
+                ? currentImage
+                : URL.createObjectURL(currentImage as File)
+            }
+            alt=""
+          />
         </div>
       )}
       <FileInput
-        label='Image'
-        name='image'
+        label="Image"
+        name="image"
         error={false}
         onChange={handleImage}
       />
       <Button
-        loading={categoryState.update.loading || fileUploadState.loading}
-        className='w-min ml-auto '
-        children='Update'
+        loading={updateCategoryLoading || fileUploadLoading}
+        className="w-min ml-auto "
+        children="Update"
         onClick={() => handleOnClick()}
       />
     </div>
@@ -145,6 +150,3 @@ const UpdateCategory = () => {
 }
 
 export default UpdateCategory
-
-
-

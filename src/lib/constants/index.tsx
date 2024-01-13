@@ -67,13 +67,13 @@ export const DASHBOARD_SIDEBAR_LINKS: Array<IRouteDashboardSidebar> = [
 			{
 				key: 'product-list',
 				label: 'List',
-				path: '/product/list',
+				path: '/products/list',
 				icon: <FaCircle fontSize={8} color='green'/>
 			},
 			{
 				key: 'product-add',
 				label: 'Add',
-				path: '/product/add',
+				path: '/products/add',
 				icon: <FaCircle fontSize={8} color='green'/>
 			},
 		]

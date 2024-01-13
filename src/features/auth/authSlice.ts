@@ -44,9 +44,14 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    login: (state, action: PayloadAction<LoginPayload>) => {
-      state.login.loading = true
-      console.log('loggin in', state.currentUser, action.payload)
+    login: (state, action: PayloadAction<Token>) => {
+      // state.login.loading = true
+      state.token = action.payload
+      if (action.payload) {
+        localStorage.setItem('token', JSON.stringify(action.payload))
+      } else {
+        localStorage.removeItem('token')
+      }
     },
 
     loginFailed: (state, action: PayloadAction<Error>) => {
@@ -80,7 +85,7 @@ const authSlice = createSlice({
 
     setUser: (state, action: PayloadAction<User>) => {
       state.currentUser = action.payload
-      state.login.loading = action.payload ? false : true
+      // state.login.loading = action.payload ? false : true
 
       if (action.payload) {
         localStorage.setItem('user', JSON.stringify(action.payload))
@@ -98,5 +103,5 @@ const authSlice = createSlice({
   },
 })
 
-export const { login, setUser, loginFailed } = authSlice.actions
+export const { login, setUser, loginFailed, logout } = authSlice.actions
 export default authSlice.reducer

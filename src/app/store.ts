@@ -6,18 +6,22 @@ import productReducer from '../features/product/productSlice'
 import fileUploadReducer from '../features/upload/fileUploadSlice'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from './rootSaga'
+import { apiSlice } from '../features/api/apiSlice'
 
 const sagaMiddleware = createSagaMiddleware()
 
 export const store = configureStore({
   reducer: {
+    [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authReducer,
     category: categoryReducer,
     subCategory: subCategoryReducer,
     product: productReducer,
     file: fileUploadReducer,
   },
-  middleware: [sagaMiddleware],
+  devTools: false,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(sagaMiddleware).concat(apiSlice.middleware),
 })
 
 sagaMiddleware.run(rootSaga)

@@ -28,3 +28,7 @@ export interface User {
   lastName: string
   phoneNo: string
 }
+
+export interface LogoutPayload {
+  refresh_token: string
+}

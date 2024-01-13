@@ -2,64 +2,64 @@ import React, { ChangeEvent, useEffect, useState } from 'react'
 import TextField from '../../components/TextField'
 import FileInput from '../../components/FileInput'
 import Button from '../../components/Button'
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { RootState } from '../../app/store'
-import { subCategorySliceAction } from '../../features/sub_category/subCategoryAction'
 import { toast } from 'react-toastify'
-import { fileUploadSliceAction } from '../../features/upload/fileUploadAction'
 import { Listbox } from '@headlessui/react'
 import { Category } from '../../interface/categoryInterface'
+import { useGetAllCategoryQuery } from '../../features/category/categoryApis'
+import { useCreateSubCategoryMutation } from '../../features/sub_category/subCategoryApis'
+import { useFileUploadMutation } from '../../features/upload/fileUploadApis'
 
-const AddSubCategory = () => {
+const AddSubCategory = ({setRefresh}: {setRefresh: any}) => {
+    const [fileUpload, { isLoading: fileUploadLoading }] = useFileUploadMutation()
 
-    const fileUploadState = useAppSelector((state: RootState) => state.file);
-    const categoryState = useAppSelector((state: RootState) => state.category);
-    const subCategoryState = useAppSelector((state: RootState) => state.subCategory);
-    const dispatch = useAppDispatch();
+    const {
+        data: categoriesData,
+        isLoading: categoriesIsLoading,
+        error: getCategoriesFailed,
+      } = useGetAllCategoryQuery(undefined, { refetchOnMountOrArgChange: true })
+
+      const [
+        createSubCategory,
+        {
+          isLoading: createSubCategoryLoading,
+          isSuccess: createSubCategorySuccess,
+          error: createSubCategoryFailed,
+          data: createSubCategoryData
+        },
+      ] = useCreateSubCategoryMutation()
 
     const [currentImage, setCurrentImage] = useState<File>();
-    const [selectedCategory, setSelectedCategory] = useState(categoryState.category[0])
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>()
     const [subCategory, setSubCategory] = useState<string>('');
 
 
     useEffect(() => {
-
-        if (!fileUploadState.loading
-            && fileUploadState.data?.success
-            && fileUploadState.data.url
-        ) {
-
-            const name = subCategory
-            const image = fileUploadState.data.url
-            const parentId = selectedCategory._id!
-
-
-            dispatch(subCategorySliceAction.createSubCategoryStartAction({ name: name, image: image, parentId: parentId }))
-
+        if (categoriesData) {
+        
         }
-        else if (!fileUploadState.loading && fileUploadState.error) {
-            toast.error(fileUploadState.error.message);
+        if (getCategoriesFailed) {
+          if ('data' in getCategoriesFailed) {
+            const errorData = getCategoriesFailed as any
+            console.log(`error ${errorData.data.message}`)
+          }
         }
+      }, [categoriesData, getCategoriesFailed])
 
-    }, [
-        fileUploadState.loading,
-        fileUploadState.data?.success,
-        fileUploadState.data?.url,
-    ])
-
-
-    useEffect(() => {
-
-
-        if (!subCategoryState.loading && subCategoryState.successMessage) {
-          toast.success(subCategoryState.successMessage);
+      useEffect(() => {
+        if (createSubCategorySuccess) {
+          const message =  createSubCategoryData?.message || 'Sub-Category added successfully'
+          toast.success(message)
+          setRefresh(true);
+    
         }
-        else if (!subCategoryState.loading && subCategoryState.error) {
-          toast.error(subCategoryState.error.message);
+        if (createSubCategoryFailed) {
+          if ('data' in createSubCategoryFailed) {
+            const errorData = createSubCategoryFailed as any
+            toast.error(errorData.data.message)
+          }
         }
-      }, [
-        categoryState.loading
-      ])
+      }, [createSubCategorySuccess, createSubCategoryFailed])
+
 
     const handleImage = (event: ChangeEvent<HTMLInputElement>): void => {
         const selectedFiles = event.target.files as FileList;
@@ -73,7 +73,7 @@ const AddSubCategory = () => {
     }
 
 
-    const handleOnClick = (): void => {
+    const handleOnClick = async () => {
 
         if (!selectedCategory) {
             toast.error('Please select the Main Category')
@@ -87,7 +87,19 @@ const AddSubCategory = () => {
             toast.error('Choose image cannot be empty!')
             return
         }
-        dispatch(fileUploadSliceAction.uploadStartAction(currentImage))
+        try {
+            const response = await fileUpload(currentImage).unwrap()
+            if (!response.url) return
+      
+            const subCategoryName = subCategory
+            const image = response.url
+            const parentId = selectedCategory._id!
+            const data = { name: subCategoryName, image: image, parentId: parentId}
+            await createSubCategory(data)
+          } catch (error: any) {
+            console.log(`error ${error}`)
+            toast.error(error)
+          }   
     }
 
     return (
@@ -106,11 +118,11 @@ const AddSubCategory = () => {
                         <label>Select Main Category</label>
                         <Listbox value={selectedCategory} onChange={setSelectedCategory}>
                             <Listbox.Button className=' mt-3 pl-3 py-2.5 w-full text-left focus:outline-none focus:shadow-outline-blue focus:border-green-500 relative border shadow-sm border-gray-300 rounded text-gray-800'>
-                                <span className="block truncate">{selectedCategory.name}</span>
+                                <span className="block truncate">{selectedCategory?.name? selectedCategory?.name : 'Select Category '}</span>
                             </Listbox.Button>
                             <Listbox.Options
                                 className="border border-gray-300 rounded mt-1 w-full " >
-                                {categoryState.category.map((item: Category) => (
+                                {categoriesData && categoriesData?.data?.map((item: Category) => (
                                     <Listbox.Option
                                         key={item._id}
                                         value={item}
@@ -186,7 +198,7 @@ const AddSubCategory = () => {
                 onChange={handleImage}
             />
             <Button
-                loading={subCategoryState.loading || fileUploadState.loading}
+                loading={createSubCategoryLoading || fileUploadLoading}
                 className='w-min ml-auto '
                 children='Submit'
                 onClick={() => handleOnClick()}
@@ -194,5 +206,4 @@ const AddSubCategory = () => {
         </div>
     )
 }
-
 export default AddSubCategory
