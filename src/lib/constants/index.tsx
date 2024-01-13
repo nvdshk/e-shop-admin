@@ -82,7 +82,21 @@ export const DASHBOARD_SIDEBAR_LINKS: Array<IRouteDashboardSidebar> = [
 		key: 'orders',
 		label: 'Orders',
 		path: '/orders',
-		icon: <HiOutlineShoppingCart />
+		icon: <HiOutlineShoppingCart />,
+		subRoutes: [
+			{
+				key: 'orders-list',
+				label: 'List',
+				path: '/orders/list',
+				icon: <FaCircle fontSize={8} color='green'/>
+			},
+			{
+				key: 'orders-pending',
+				label: 'Pending',
+				path: '/orders/pending',
+				icon: <FaCircle fontSize={8} color='green'/>
+			},
+		]
 	},
 	{
 		key: 'customers',
