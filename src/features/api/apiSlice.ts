@@ -12,7 +12,7 @@ import { base_url, dev_base_url } from '../../util/baseUrl'
 import { logout } from '../auth/authSlice'
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: dev_base_url,
+  baseUrl: base_url,
   prepareHeaders: (headers) => {
     // this method should retrieve the token without a hook
     const token = TokenService.getLocalAccessToken()
