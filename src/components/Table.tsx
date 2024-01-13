@@ -27,7 +27,7 @@ const Table = ({ columns, data }: any) => {
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()} className="divide-y divide-gray-200">
+          <tbody {...getTableBodyProps()} className="divide-y divide-gray-200 bg-white">
             {rows.map((row) => {
               prepareRow(row)
               return (

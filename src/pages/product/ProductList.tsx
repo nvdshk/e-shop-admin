@@ -106,7 +106,7 @@ const ProductList = () => {
     },
   ]
 
-  const handleAddProduct =  () => {
+  const handleAddProduct = () => {
     navigate(`/products/add`)
   }
   const handleView = async (id: string) => {
@@ -125,25 +125,24 @@ const ProductList = () => {
   }
 
   return (
-    <div className="w-full bg-white p-5 rounded">
-      <div className="py-6">
-        <h2 className="text-1xl font-bold">Product List</h2>
-        <div className="bg-gray-100 h-[2px] mt-4" />
-      </div>
-     
-     <div className='flow-root pb-4'>
-     <Button
-        loading={false}
-        className="float-right w-max h-min m-3 "
-        children= 'Add Product'
-        onClick={() => handleAddProduct()}
-      />
-     </div >
-     
-   
+    <>
+      <div className="w-full bg-white p-5 rounded">
+        <div className="py-2">
+          <h2 className="text-1xl font-bold">Product List</h2>
+          <div className="bg-gray-100 h-[2px] mt-4" />
+        </div>
 
+        <div className="flow-root mt-3">
+          <Button
+            loading={false}
+            className="float-right w-max h-min "
+            children="Add Product"
+            onClick={() => handleAddProduct()}
+          />
+        </div>
+      </div>
       <Table columns={columns} data={products} />
-    </div>
+    </>
   )
 }
 

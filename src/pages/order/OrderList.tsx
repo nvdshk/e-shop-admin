@@ -52,23 +52,42 @@ const OrderList = () => {
     {
       Header: 'Order Date',
       accessor: 'createdAt',
-      Cell: (cell: any) => <div> {new Date(cell.row.values.createdAt).toLocaleDateString()} <br></br>{new Date(cell.row.values.createdAt).toLocaleTimeString()} </div>,
+      Cell: (cell: any) => (
+        <div>
+          {' '}
+          {new Date(cell.row.values.createdAt).toLocaleDateString()} <br></br>
+          {new Date(cell.row.values.createdAt).toLocaleTimeString()}{' '}
+        </div>
+      ),
     },
     {
       Header: 'Customer Info',
       accessor: 'user',
-      Cell: (cell: any) => <div> {cell.row.values.user.name }<br></br>{cell.row.values.user.email } </div>,
-
+      Cell: (cell: any) => (
+        <div>
+          {' '}
+          {cell.row.values.user.name}
+          <br></br>
+          {cell.row.values.user.email}{' '}
+        </div>
+      ),
     },
     {
-        Header: 'Total Amount',
-        accessor: 'totalAmount',
-        Cell: (cell: any) => <div> {toCurrency(cell.row.values.totalAmount)} </div>,
-      },
+      Header: 'Total Amount',
+      accessor: 'totalAmount',
+      Cell: (cell: any) => (
+        <div> {toCurrency(cell.row.values.totalAmount)} </div>
+      ),
+    },
     {
       Header: 'Order Status',
       accessor: 'orderStatus',
-      Cell: (cell: any) => <div className="flex items-center"> {getOrderStatus(cell.row.values.orderStatus, true)} </div>,
+      Cell: (cell: any) => (
+        <div className="flex items-center">
+          {' '}
+          {getOrderStatus(cell.row.values.orderStatus, true)}{' '}
+        </div>
+      ),
     },
     {
       Header: 'Action',
@@ -94,16 +113,15 @@ const OrderList = () => {
     return <Spinner />
   }
   return (
-    <div className="w-full bg-white p-5 rounded">
-      <div className="py-6">
-        <h2 className="text-1xl font-bold">All Orders List</h2>
-        {/* <div className="bg-gray-100 h-[2px] mt-4" /> */}
+    <>
+      <div className="w-full bg-white p-5 rounded">
+        <div className="py-6">
+          <h2 className="text-1xl font-bold">All Orders List</h2>
+          {/* <div className="bg-gray-100 h-[2px] mt-4" /> */}
+        </div>
       </div>
-     
-   
-
       <Table columns={columns} data={orders} />
-    </div>
+    </>
   )
 }
 
