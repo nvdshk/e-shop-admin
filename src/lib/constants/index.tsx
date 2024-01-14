@@ -1,5 +1,6 @@
 
 import { FaCircle, FaCommentDots, FaDotCircle } from 'react-icons/fa'
+import { IoNotifications } from "react-icons/io5";
 import {
 	HiOutlineViewGrid,
 	HiOutlineCube,
@@ -105,6 +106,12 @@ export const DASHBOARD_SIDEBAR_LINKS: Array<IRouteDashboardSidebar> = [
 		icon: <HiOutlineUsers />
 	},
 	{
+		key: 'notifications',
+		label: 'Notifications',
+		path: '/notifications',
+		icon: <IoNotifications />
+	},
+	{
 		key: 'transactions',
 		label: 'Transactions',
 		path: '/transactions',
@@ -122,7 +129,7 @@ export const DASHBOARD_SIDEBAR_BOTTOM_LINKS: Array<IRouteDashboardSidebar> = [
 	{
 		key: 'settings',
 		label: 'Settings',
-		path: '/settings',
+		path: '/store/update',
 		icon: <HiOutlineCog />
 	},
 	{
