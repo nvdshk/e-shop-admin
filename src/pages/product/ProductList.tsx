@@ -64,7 +64,18 @@ const ProductList = () => {
     },
     {
       Header: 'Product Name',
-      accessor: 'name',
+      accessor: '',
+      Cell: (props: any) => (
+        <div className='flex flex-row items-center'>
+          <img
+            className="rounded-lg w-10 h-10 mr-2"
+            src={
+              props.row.original.image ?? 'https://via.placeholder.com/300x200/FF0000'
+            }
+            alt=""
+          /> {` ${props.row.original.name}` }
+        </div>
+      ),
     },
     {
       Header: 'Price',
