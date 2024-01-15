@@ -129,7 +129,7 @@ export const DASHBOARD_SIDEBAR_BOTTOM_LINKS: Array<IRouteDashboardSidebar> = [
 	{
 		key: 'settings',
 		label: 'Settings',
-		path: '/store/update',
+		path: '/business-settings',
 		icon: <HiOutlineCog />
 	},
 	{

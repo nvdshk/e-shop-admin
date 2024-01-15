@@ -1,27 +1,27 @@
 import { Request, Response } from '../../interface/responseInterface'
-import { Store } from '../../interface/settingInterface'
+import { Currency, Store } from '../../interface/settingInterface'
 import { apiSlice } from '../api/apiSlice'
 
 export const storeSettingsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getStoreSettings: builder.query<Response<Store>, undefined>({
+    getAllCurrency: builder.query<Response<Array<Currency>>, undefined>({
       query: () => ({
-        url: '/store-settings',
+        url: '/currency-settings',
         method: 'GET',
         credentials: 'include' as const,
       }),
     }),
 
-    saveStoreSettings: builder.mutation<Response<Store>, Request<Store>>({
+    createCurrency: builder.mutation<Response<Currency>, Currency>({
       query: (data) => ({
-        url: `/store-settings/${data._id}`,
-        method: 'PUT',
-        body: data.data,
+        url: `/currency-settings`,
+        method: 'POST',
+        body: data,
         credentials: 'include' as const,
       }),
     }),
   }),
 })
 
-export const { useGetStoreSettingsQuery, useSaveStoreSettingsMutation } =
+export const { useGetAllCurrencyQuery, useCreateCurrencyMutation } =
   storeSettingsApi
