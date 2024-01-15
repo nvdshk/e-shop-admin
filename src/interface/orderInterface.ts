@@ -10,6 +10,7 @@ export interface Order {
   items: [Item]
   address: Address
   totalAmount: number
+  paymentType: string
   paymentStatus: string
   orderStatus: [OrderStatus]
   createdAt: string
@@ -33,11 +34,12 @@ export interface Item {
     color: string
     price: string
     size: string[]
+    shippingFee: string
   }
   _id: string
 }
 
 export interface OrderStatusPayload {
-  orderId: string
+  _id: string
   statusId: string
 }

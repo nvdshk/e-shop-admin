@@ -1,13 +1,7 @@
 import { OrderStatus } from "../../interface/orderInterface"
 
-export function getOrderStatus(statusValue: string |  [OrderStatus] , isStatusList?: boolean) {
-	let status = Array.isArray(statusValue)? '': statusValue
-
-	if(isStatusList &&  Array.isArray(statusValue) ){
-		status = statusValue.filter(
-            (item: any) => item.isCompleted === true
-          )[0].type
-	}
+export function getOrderStatus(status: string) {
+	
 	switch (status) {
 		case 'PLACED' || 'ordered':
 			return (
@@ -54,7 +48,63 @@ export function getOrderStatus(statusValue: string |  [OrderStatus] , isStatusLi
 	}
 }
 
+export function getPaymentStatus(status: string) {
+
+	switch (status) {
+	
+		case 'pending':
+			return (
+				<span className="capitalize py-1  rounded-md text-xs text-sky-600 ">
+					{status.replaceAll('_', ' ').toLowerCase()}
+				</span>
+			)
+
+		case 'completed' :
+			return (
+				<span className="capitalize py-1  rounded-md text-xs text-green-600">
+					{status.replaceAll('_', ' ').toLowerCase()}
+				</span>
+			)
+		default:
+			return (
+				<span className="capitalize py-1 px-2 rounded-md text-xs text-red-600 bg-red-100">
+					{status.replaceAll('_', ' ').toLowerCase()}
+				</span>
+			)
+	}
+}
+
+export function getCurrentOrderStatus(status: Array<OrderStatus>): OrderStatus{
+	
+	const currentStatus =  status.filter(
+		(item: any) => item.isCompleted === true
+	  )
+
+	  
+
+	  console.log(currentStatus[currentStatus.length - 1].type )
+
+	
+	  return currentStatus[currentStatus.length - 1]
+}
+
 export function toCurrency(value: string) {
     let number = parseFloat(value);
     return number.toLocaleString('USD');
 }
+
+export function getSubTotal(price: number, discount: number): number {
+    return (price - discount)
+}
+
+export function getTaxAmount(taxRate:number, taxAmount: number): number {
+return (taxAmount * taxRate) / 100
+}
+
+export function getCurrentSymbol(): string{
+	return "$"
+}
+
+export function getTotalAmount(subTotalAmount:number, taxAmount: number, deliveryFee: number): number {
+	return subTotalAmount +  taxAmount + deliveryFee
+	}

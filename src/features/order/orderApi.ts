@@ -25,14 +25,11 @@ export const orderApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    updateOrderStatus: builder.mutation<
-      Response<Product>,
-      Request<OrderStatusPayload>
-    >({
+    updateOrderStatus: builder.mutation<Response<Product>, OrderStatusPayload>({
       query: (data) => ({
-        url: `/orders/${data.data.orderId}/status/${data.data.statusId}`,
+        url: `/orders/${data._id}/status/${data.statusId}`,
         method: 'PUT',
-        body: data.data,
+        body: {},
         credentials: 'include' as const,
       }),
     }),

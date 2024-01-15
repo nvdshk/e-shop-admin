@@ -14,6 +14,7 @@ import UpdateProduct from './pages/product/UpdateProduct';
 import OrderList from './pages/order/OrderList';
 import StoreSettings from './pages/settings/StoreSettings';
 import Notifications from './pages/notifications/Notifications';
+import OrderDetails from './pages/order/OrderDetails';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
               <Route path='products/list' element={<ProductList/>}/>
               <Route path='products/edit/:id' element={<UpdateProduct/>}/>
               <Route path='orders/list' element={<OrderList/>}/>
+              <Route path='orders/view/:id' element={<OrderDetails/>}/>
               <Route path='store/update' element={<StoreSettings/>}/>
               <Route path='notifications' element={<Notifications/>}/>
             </Route>

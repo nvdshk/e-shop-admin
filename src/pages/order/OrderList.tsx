@@ -7,7 +7,12 @@ import { IoMdEye } from 'react-icons/io'
 import { FaFileInvoice } from 'react-icons/fa'
 import Button from '../../components/Button'
 import Table from '../../components/Table'
-import { getOrderStatus, toCurrency } from '../../lib/helpers'
+import {
+  getCurrentOrderStatus,
+  getOrderStatus,
+  getPaymentStatus,
+  toCurrency,
+} from '../../lib/helpers'
 
 const OrderList = () => {
   const [orders, setOrders] = useState<Array<Order>>([])
@@ -21,7 +26,9 @@ const OrderList = () => {
 
   useEffect(() => {
     if (getOrdersData?.data) {
-      setOrders(getOrdersData.data)
+      const orderList: Array<Order> = [...getOrdersData.data]
+      orderList.reverse()
+      setOrders(orderList)
     }
     if (getOrdersFailed) {
       if ('data' in getOrdersFailed) {
@@ -75,8 +82,12 @@ const OrderList = () => {
     {
       Header: 'Total Amount',
       accessor: 'totalAmount',
-      Cell: (cell: any) => (
-        <div> {toCurrency(cell.row.values.totalAmount)} </div>
+      Cell: (props: any) => (
+        <div>
+          {toCurrency(props.row.original.totalAmount)}
+          <br></br>
+          {getPaymentStatus(props.row.original.paymentStatus)}
+        </div>
       ),
     },
     {
@@ -85,7 +96,9 @@ const OrderList = () => {
       Cell: (cell: any) => (
         <div className="flex items-center">
           {' '}
-          {getOrderStatus(cell.row.values.orderStatus, true)}{' '}
+          {getOrderStatus(
+            getCurrentOrderStatus(cell.row.values.orderStatus).type
+          )}{' '}
         </div>
       ),
     },

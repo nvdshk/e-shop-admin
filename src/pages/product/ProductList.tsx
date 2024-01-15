@@ -80,7 +80,7 @@ const ProductList = () => {
     {
       Header: 'Price',
       accessor: 'price',
-      Cell: (cell: any) => <div> {toCurrency(cell.row.values.price)} </div>,
+      Cell: (cell: any) => <div> ${toCurrency(cell.row.values.price)} </div>,
     },
     {
       Header: 'Stock',
