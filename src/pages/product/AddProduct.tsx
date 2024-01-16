@@ -38,6 +38,7 @@ const AddProduct = () => {
   const [color, setColor] = useState<string>('')
   const [price, setPrice] = useState<string>('')
   const [stock, setStock] = useState<string>('')
+  const [tax, setTax] = useState<number>()
 
   const [sizeList, setSizeList] = useState<string[]>([])
   const [sizeValue, setSizeValue] = useState<string>('')
@@ -142,6 +143,11 @@ const AddProduct = () => {
     setStock(stock)
   }
 
+  const handleChangeTax = (event: ChangeEvent<HTMLInputElement>): void => {
+    const tax = event.target.value
+    setTax(Number(tax))
+  }
+
   const handleOnClickAddSize = (): void => {
     if (!sizeValue) {
       toast.error('Size field cannot be empty!')
@@ -202,6 +208,9 @@ const AddProduct = () => {
     } else if (!stock) {
       toast.error('Stock field cannot be empty!')
       return
+    } else if (!tax) {
+      toast.error('Tax field cannot be empty!')
+      return
     } else if (sizeList.length < 0) {
       toast.error('Please add size')
       return
@@ -220,6 +229,7 @@ const AddProduct = () => {
       const pColor = color
       const pPrice = price
       const pStock = stock
+      const pTax = tax
       const pSizeList = sizeList
       const pFeatureList = featureList
       const pMainCategory = selectedCategory?._id!
@@ -236,6 +246,7 @@ const AddProduct = () => {
         description: pDescription,
         features: pFeatureList,
         stock: pStock,
+        tax: pTax,
         categories: categories,
       }
       await createProduct(data)
@@ -479,6 +490,17 @@ const AddProduct = () => {
                 ))}
             </div>
           </div>
+
+          <TextField
+            type="number"
+            label="Tax"
+            value={tax ?? ''}
+            name="tax"
+            error={false}
+            maxLenght={4}
+            onChange={handleChangeTax}
+            placeholder="Ex: 5"
+          />
         </div>
         <div className="flex-1 ml-4">
           <div className=" flex flex-col ">

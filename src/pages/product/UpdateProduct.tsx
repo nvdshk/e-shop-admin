@@ -47,6 +47,7 @@ const UpdateProduct = () => {
   const [color, setColor] = useState<string>('')
   const [price, setPrice] = useState<string>('')
   const [stock, setStock] = useState<string>('')
+  const [tax, setTax] = useState<number>(0)
 
   const [sizeList, setSizeList] = useState<string[]>([])
   const [sizeValue, setSizeValue] = useState<string>('')
@@ -98,7 +99,9 @@ const UpdateProduct = () => {
       setColor(product.color)
       setPrice(product.price)
       setStock(product.stock)
+      setTax(product?.tax ?? 0)
       setSizeList(product.size)
+
       setFeatureList(product.features)
 
       getAllCategories(undefined)
@@ -153,7 +156,8 @@ const UpdateProduct = () => {
 
   useEffect(() => {
     if (createProductSuccess) {
-      const message = createProductData?.message || 'Product updated successfully'
+      const message =
+        createProductData?.message || 'Product updated successfully'
       toast.success(message)
       navigate('/products/list')
     }
@@ -195,6 +199,11 @@ const UpdateProduct = () => {
   const handleChangeStock = (event: ChangeEvent<HTMLInputElement>): void => {
     const stock = event.target.value
     setStock(stock)
+  }
+
+  const handleChangeTax = (event: ChangeEvent<HTMLInputElement>): void => {
+    const tax = event.target.value
+    setTax(Number(tax))
   }
 
   const handleOnClickAddSize = (): void => {
@@ -273,6 +282,9 @@ const UpdateProduct = () => {
     } else if (!stock) {
       toast.error('Stock field cannot be empty!')
       return
+    } else if (!tax) {
+      toast.error('Tax field cannot be empty!')
+      return
     } else if (featureList.length == 0) {
       toast.error('Please add feature')
       return
@@ -291,6 +303,7 @@ const UpdateProduct = () => {
       const pColor = color
       const pPrice = price
       const pStock = stock
+      const pTax = tax
       const pSizeList = sizeList
       const pFeatureList = featureList
       const pMainCategory = selectedCategory?._id!
@@ -318,10 +331,11 @@ const UpdateProduct = () => {
         description: pDescription,
         features: pFeatureList,
         stock: pStock,
+        tax: pTax,
         categories: categories,
       }
 
-      const data = {_id: pId, data: product}
+      const data = { _id: pId, data: product }
       await updateProduct(data)
     } catch (error: any) {
       console.log(`error ${error}`)
@@ -541,6 +555,54 @@ const UpdateProduct = () => {
       {/* Product Size, Features */}
       <div className="flex m-2 ">
         <div className="flex-1 mr-4">
+          <div className=" flex flex-col">
+            <label>Add Size</label>
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="Ex: XL"
+                value={sizeValue}
+                onChange={(e) => setSizeValue(e.target.value)}
+                className="text-sm focus:outline-none active:outline-none border border-gray-300 w-full h-10 pl-4 pr-4 mt-3 rounded-sm"
+              />
+              <Button
+                loading={false}
+                className="w-min h-min m-3"
+                children={<HiOutlineDocumentAdd fontSize={24} />}
+                onClick={() => handleOnClickAddSize()}
+              />
+            </div>
+            <div className=" mt-2">
+              {sizeList.length > 0 &&
+                sizeList.map((item, i) => (
+                  <div
+                    key={i}
+                    className=" flex flex-row  items-center w-min  bg-green-100  py-1  px-2 m-1  rounded-md "
+                  >
+                    <span className="capitalize text-m text-green-600 ">
+                      {item}
+                    </span>
+                    <MdCancel
+                      className="text-red-500 hover:text-red-700 ml-2"
+                      size={'24px'}
+                      onClick={() => handleRemoveSize(item)}
+                    />
+                  </div>
+                ))}
+            </div>
+          </div>
+          <TextField
+            type="number"
+            label="Tax"
+            value={tax}
+            name="tax"
+            error={false}
+            maxLenght={4}
+            onChange={handleChangeTax}
+            placeholder="Ex: 5"
+          />
+        </div>
+        <div className="flex-1 ml-4">
           <div className=" flex flex-col ">
             <label>Add Features</label>
             <div className="flex">
@@ -586,44 +648,6 @@ const UpdateProduct = () => {
                       className="text-red-500 hover:text-red-700"
                       size={'24px'}
                       onClick={() => handleRemoveFeature(item)}
-                    />
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-        <div className="flex-1 ml-4">
-          <div className=" flex flex-col">
-            <label>Add Size</label>
-            <div className="flex">
-              <input
-                type="text"
-                placeholder="Ex: XL"
-                value={sizeValue}
-                onChange={(e) => setSizeValue(e.target.value)}
-                className="text-sm focus:outline-none active:outline-none border border-gray-300 w-full h-10 pl-4 pr-4 mt-3 rounded-sm"
-              />
-              <Button
-                loading={false}
-                className="w-min h-min m-3"
-                children={<HiOutlineDocumentAdd fontSize={24} />}
-                onClick={() => handleOnClickAddSize()}
-              />
-            </div>
-            <div className=" mt-2">
-              {sizeList.length > 0 &&
-                sizeList.map((item, i) => (
-                  <div
-                    key={i}
-                    className=" flex flex-row  items-center w-min  bg-green-100  py-1  px-2 m-1  rounded-md "
-                  >
-                    <span className="capitalize text-m text-green-600 ">
-                      {item}
-                    </span>
-                    <MdCancel
-                      className="text-red-500 hover:text-red-700 ml-2"
-                      size={'24px'}
-                      onClick={() => handleRemoveSize(item)}
                     />
                   </div>
                 ))}

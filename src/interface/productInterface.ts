@@ -9,5 +9,6 @@ export interface Product {
   description: string
   features: string[]
   stock: string
+  tax?: number
   categories: string[]
 }
