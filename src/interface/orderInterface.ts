@@ -34,6 +34,7 @@ export interface Item {
     color: string
     price: string
     size: string[]
+    tax: number
     shippingFee: string
   }
   _id: string
